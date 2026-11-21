@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kitchen Expense Portal · The Wisdom Club Nerul</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+--bg:#f5f3ee;--card:#ffffff;--ink:#1c2826;--muted:#687472;--line:#e3dfd5;--soft:#faf9f6;
+--brand:#0f5c54;--brand-ink:#0b4740;--brand-soft:#e6f1ee;--accent:#c4732a;
+--danger:#b3372e;--danger-soft:#fbecea;--ok:#2f7d4f;--warn:#a86a12;
+--fruit:#2f7d4f;--fruit-bg:#e7f3ea;--juice:#b8650f;--juice-bg:#fdf0e1;--misc:#6450a8;--misc-bg:#efecf9;
+--r:14px;--shadow:0 1px 2px rgba(20,30,28,.05),0 4px 14px rgba(20,30,28,.05);
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:"Plus Jakarta Sans",system-ui,-apple-system,Segoe UI,Roboto,sans-serif;font-size:15px;line-height:1.45;-webkit-text-size-adjust:100%}
+button,input,select,textarea{font:inherit;color:inherit}
+.wrap{max-width:1080px;margin:0 auto;padding:0 14px}
+header.top{background:var(--brand);color:#fff;padding:16px 0 14px}
+.top .wrap{display:flex;align-items:center;gap:12px;justify-content:space-between}
+.brand h1{margin:0;font-size:19px;font-weight:800;letter-spacing:-.01em}
+.brand p{margin:2px 0 0;font-size:12.5px;opacity:.82;letter-spacing:.02em}
+.pill{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;padding:5px 10px;border-radius:99px;background:rgba(255,255,255,.14);white-space:nowrap}
+.pill i{width:8px;height:8px;border-radius:50%;background:#cbd5d3;display:inline-block}
+.pill.ok i{background:#7be0a4}.pill.warn i{background:#ffc66b}.pill.err i{background:#ff8a80}
+.monthbar{background:var(--brand-ink);color:#fff}
+.monthbar .wrap{display:flex;align-items:center;gap:10px;padding-top:9px;padding-bottom:9px;flex-wrap:wrap}
+.mnav{display:flex;align-items:center;gap:6px}
+.mnav button{background:rgba(255,255,255,.12);border:0;color:#fff;width:34px;height:34px;border-radius:10px;font-size:18px;cursor:pointer}
+.mnav input{background:#fff;color:var(--ink);border:0;border-radius:10px;height:34px;padding:0 10px;font-weight:600;min-width:150px}
+.mtotal{margin-left:auto;font-size:13px;opacity:.9}
+.mtotal b{font-size:16px;opacity:1}
+nav.tabs{position:sticky;top:0;z-index:20;background:var(--bg);border-bottom:1px solid var(--line)}
+nav.tabs .wrap{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none}
+nav.tabs button{flex:1 0 auto;border:0;background:none;padding:13px 12px 11px;font-weight:600;color:var(--muted);border-bottom:3px solid transparent;cursor:pointer;font-size:14px}
+nav.tabs button.on{color:var(--brand);border-bottom-color:var(--brand)}
+main{padding:16px 0 80px}
+section.view{display:none}section.view.on{display:block}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:16px;margin-bottom:14px}
+.card h2{margin:0 0 12px;font-size:16px;font-weight:700}
+.card h2 small{font-weight:500;color:var(--muted);font-size:12.5px;margin-left:6px}
+.grid{display:grid;gap:10px}
+.g3{grid-template-columns:repeat(3,1fr)}.g2{grid-template-columns:repeat(2,1fr)}
+@media(max-width:700px){.g3,.g2,#nGrid{grid-template-columns:1fr!important}}
+label.f{display:flex;flex-direction:column;gap:5px;font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+input.i,select.i,textarea.i{width:100%;border:1px solid var(--line);background:var(--soft);border-radius:10px;padding:10px 11px;font-size:15px;color:var(--ink);text-transform:none;letter-spacing:0;font-weight:500;outline:none;min-height:42px}
+input.i:focus,select.i:focus,textarea.i:focus{border-color:var(--brand);background:#fff;box-shadow:0 0 0 3px var(--brand-soft)}
+textarea.i{min-height:60px;resize:vertical}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;border:1px solid var(--line);background:#fff;border-radius:10px;padding:9px 14px;font-weight:600;font-size:14px;cursor:pointer;min-height:40px;color:var(--ink);text-decoration:none}
+.btn:hover{border-color:#cfc9bc}
+.btn.pri{background:var(--brand);border-color:var(--brand);color:#fff}
+.btn.pri:hover{background:var(--brand-ink)}
+.btn.dan{color:var(--danger);border-color:#ecc9c5}
+.btn.sm{padding:5px 10px;min-height:32px;font-size:13px;border-radius:8px}
+.btn.ghost{border-color:transparent;background:transparent}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn.big{width:100%;min-height:48px;font-size:16px}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.spacer{flex:1}
+.muted{color:var(--muted)}
+.chip{display:inline-block;font-size:11.5px;font-weight:700;padding:3px 8px;border-radius:99px;white-space:nowrap}
+.c-fruit{background:var(--fruit-bg);color:var(--fruit)}.c-juice{background:var(--juice-bg);color:var(--juice)}.c-misc{background:var(--misc-bg);color:var(--misc)}
+.c-off{background:#eee;color:#777}
+/* cart */
+.cart{display:flex;flex-direction:column;gap:10px;margin:6px 0 10px}
+.ci{border:1px solid var(--line);border-radius:12px;padding:10px;background:var(--soft);display:grid;grid-template-columns:140px 1fr 80px 100px 110px 110px 34px;gap:8px;align-items:end}
+.ci .amt{font-weight:700;font-size:15px;padding:10px 4px;text-align:right;white-space:nowrap}
+.ci .rm{border:0;background:none;color:var(--danger);font-size:20px;cursor:pointer;height:42px}
+.ci label.f{font-size:10.5px}
+@media(max-width:860px){.ci{grid-template-columns:1fr 1fr 1fr;}.ci .itm{grid-column:span 2}.ci .amt{text-align:left}.ci .rm{justify-self:end}}
+.carttotal{display:flex;justify-content:space-between;align-items:center;padding:12px 2px;border-top:1px dashed var(--line);margin-top:4px;font-weight:600}
+.carttotal b{font-size:20px;color:var(--brand)}
+/* tables */
+.tbl{width:100%;border-collapse:collapse;font-size:14px}
+.tbl th{text-align:left;font-size:11.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:700;padding:9px 8px;border-bottom:1px solid var(--line);white-space:nowrap;background:var(--soft)}
+.tbl td{padding:10px 8px;border-bottom:1px solid #efece5;vertical-align:middle}
+.tbl td.n,.tbl th.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.tbl tfoot td{font-weight:800;border-top:2px solid var(--line);border-bottom:0;background:var(--soft)}
+.tbl tr:hover td{background:#fcfbf8}
+.tblwrap{overflow-x:auto;margin:0 -16px;padding:0 16px}
+.sub{font-size:12px;color:var(--muted)}
+@media(max-width:700px){
+.tbl.cards thead{display:none}
+.tbl.cards tr{display:grid;grid-template-columns:1fr auto;gap:2px 10px;padding:11px 0;border-bottom:1px solid var(--line)}
+.tbl.cards td{border:0;padding:0}
+.tbl.cards td[data-k="item"]{grid-column:1;font-weight:700}
+.tbl.cards td[data-k="amt"]{grid-column:2;grid-row:1;font-weight:800;font-size:15px}
+.tbl.cards td[data-k="who"]{grid-column:1/-1}
+.tbl.cards td[data-k="meta"]{grid-column:1/-1}
+.tbl.cards td[data-k="hide"]{display:none}
+.tbl.cards td[data-k="act"]{grid-column:1/-1;text-align:left!important;padding-top:4px}
+.tbl.cards tfoot tr{display:flex;justify-content:space-between}
+.tbl.cards tfoot td[data-k="hide"]{display:none}
+}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
+@media(max-width:700px){.kpis{grid-template-columns:repeat(2,1fr)}}
+.kpi{background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.kpi .l{font-size:11.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:700}
+.kpi .v{font-size:21px;font-weight:800;margin-top:3px;font-variant-numeric:tabular-nums}
+.kpi.k1{background:var(--brand);border-color:var(--brand);color:#fff}.kpi.k1 .l{color:rgba(255,255,255,.8)}
+.empty{padding:26px 10px;text-align:center;color:var(--muted)}
+.banner{display:none;padding:10px 14px;border-radius:10px;margin-bottom:12px;font-size:14px;font-weight:500}
+.banner.on{display:block}
+.banner.warn{background:#fff4e0;color:#7a4c08;border:1px solid #f1d7a8}
+.banner.err{background:var(--danger-soft);color:#7d241d;border:1px solid #efc4bf}
+.banner.info{background:var(--brand-soft);color:var(--brand-ink);border:1px solid #c7e0da}
+.reslist .rr{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid #efece5}
+.reslist .rr:last-child{border-bottom:0}
+.reslist .rn{font-weight:600}
+.reslist .rinfo{flex:1;min-width:0}
+.reslist .ract{display:flex;gap:2px;flex-shrink:0}
+.roomtag{display:inline-block;min-width:54px;text-align:center;font-weight:700;font-size:13px;background:var(--brand-soft);color:var(--brand-ink);border-radius:8px;padding:4px 6px}
+.floorh{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:800;margin:14px 0 4px}
+.floorh:first-child{margin-top:0}
+/* modal */
+.modal{position:fixed;inset:0;background:rgba(15,25,23,.45);display:none;align-items:flex-end;justify-content:center;z-index:50;padding:0}
+.modal.on{display:flex}
+.modal .box{background:#fff;width:100%;max-width:560px;border-radius:18px 18px 0 0;padding:18px 16px 20px;max-height:92vh;overflow:auto}
+@media(min-width:700px){.modal{align-items:center}.modal .box{border-radius:18px}}
+.modal h3{margin:0 0 12px;font-size:17px}
+.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(20px);background:#1c2826;color:#fff;padding:11px 16px;border-radius:12px;font-size:14px;font-weight:500;opacity:0;pointer-events:none;transition:.25s;z-index:60;max-width:92vw;box-shadow:0 8px 24px rgba(0,0,0,.2)}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.err{background:var(--danger)}.toast.warn{background:#8a560c}
+.dlrow{display:flex;gap:8px;flex-wrap:wrap}
+.linkbtn{border:0;background:none;color:var(--brand);font-weight:600;cursor:pointer;padding:4px 0}
+.hint{font-size:12.5px;color:var(--muted);margin-top:6px}
+.ro .needwrite{display:none!important}
+.sm-only{display:none}
+.notadmin .adminonly{display:none!important}
+#login{position:fixed;inset:0;z-index:80;background:var(--brand);display:none;align-items:center;justify-content:center;padding:18px}
+#login.on{display:flex}
+#login .lbox{background:#fff;border-radius:18px;padding:22px 18px;width:100%;max-width:380px;box-shadow:0 10px 40px rgba(0,0,0,.25)}
+#login h2{margin:0 0 2px;font-size:20px}#login p{margin:0 0 16px;color:var(--muted);font-size:13px}
+#login .grid{gap:12px}
+.who{font-size:12px;opacity:.85;white-space:nowrap}
+.who b{font-weight:700}
+.req{color:var(--danger);font-weight:800}
+.i.bad{border-color:var(--danger)!important;background:var(--danger-soft)!important;box-shadow:0 0 0 3px #f6d6d2!important}
+.twc{display:inline-block;font-size:11px;font-weight:700;padding:2px 7px;border-radius:6px;background:#eef0f7;color:#3c4a7a;letter-spacing:.02em;white-space:nowrap}
+.twc.miss{background:var(--danger-soft);color:var(--danger)}
+.reqnote{font-size:12px;color:var(--danger);font-weight:600;margin-top:4px;display:none}
+.reqnote.on{display:block}
+@media(max-width:700px){
+#sumTbl .hm{display:none}#sumTbl .sm-only{display:block}
+#sumTbl thead{display:none}
+#sumTbl tbody tr{display:grid;grid-template-columns:auto 1fr auto;gap:4px 10px;padding:11px 0;border-bottom:1px solid var(--line);align-items:start}
+#sumTbl tbody td{border:0;padding:0}
+#sumTbl tbody td.dlc{grid-column:1/-1}
+#sumTbl tfoot tr{display:grid;grid-template-columns:auto 1fr auto;gap:10px}
+#sumTbl tfoot td{border:0}
+#sumTbl tfoot td:last-child{display:none}
+}
+</style>
+</head>
+<body>
+<div id="login"><form class="lbox" id="loginForm" autocomplete="on">
+<h2>Kitchen Expense Portal</h2><p>THE WISDOM CLUB · NERUL — staff login</p>
+<div class="grid">
+<label class="f"><span>Login ID (email / mobile) <span class="req">*</span></span><input class="i" id="lgId" autocomplete="username" autocapitalize="none" placeholder="e.g. name@thewisdomclub.com"></label>
+<label class="f"><span>PIN <span class="req">*</span></span><input class="i" id="lgPin" type="password" inputmode="numeric" autocomplete="current-password" placeholder="Your PIN"></label>
+<span class="reqnote" id="lgNote"></span>
+<button class="btn pri big" id="lgBtn" type="submit">Log in</button>
+</div><p style="margin:14px 0 0">Don't have a PIN? Ask the Asst. Centre Manager to add you in the Staff list.</p></form></div>
+<header class="top">
+<div class="wrap">
+<div class="brand">
+<h1>Kitchen Expense Portal</h1>
+<p>THE WISDOM CLUB · NERUL — fruits, juices &amp; misc. items per resident</p>
+</div>
+<div class="row" style="gap:6px;flex-wrap:nowrap"><span class="pill" id="status"><i></i><span>Connecting…</span></span><button class="pill" id="refresh" style="border:0;color:#fff;cursor:pointer" title="Refresh">⟳</button><button class="pill" id="logout" style="border:0;color:#fff;cursor:pointer" title="Log out">⎋</button></div>
+</div>
+</header>
+<div class="monthbar">
+<div class="wrap">
+<div class="mnav">
+<button id="mPrev" aria-label="Previous month">‹</button>
+<input type="month" id="month">
+<button id="mNext" aria-label="Next month">›</button>
+</div>
+<div class="mtotal">Month total&nbsp; <b id="mTotal">₹0.00</b></div>
+</div>
+</div>
+<nav class="tabs"><div class="wrap">
+<button data-tab="add" class="on">＋ Add Entry</button>
+<button data-tab="register">Register</button>
+<button data-tab="summary">Summary &amp; Bills</button>
+<button data-tab="residents">Residents</button>
+</div></nav>
+<main><div class="wrap">
+<div class="banner" id="banner"></div>
+<!-- ADD -->
+<section class="view on" id="v-add">
+<div class="card needwrite">
+<h2>New entry</h2>
+<div class="grid g3">
+<label class="f"><span>Date <span class="req">*</span></span><input class="i" type="date" id="fDate" required></label>
+<label class="f"><span>Resident name <span class="req">*</span></span><select class="i" id="fRes" required></select><span class="reqnote" id="fResNote">Resident name is compulsory</span></label>
+<label class="f">Entered by<input class="i" id="fBy" readonly placeholder="Your name" style="opacity:.8"></label>
+</div>
+<div class="cart" id="cart"></div>
+<button class="btn sm" id="addRow">＋ Add another item</button>
+<div class="grid g3" style="margin-top:12px">
+<label class="f">Vendor / shop<input class="i" id="fVendor" placeholder="e.g. Local fruit vendor"></label>
+<label class="f">Bill / ref no.<input class="i" id="fBill" placeholder="Optional"></label>
+<label class="f">Remarks<input class="i" id="fRemarks" placeholder="Optional"></label>
+</div>
+<p class="hint" style="margin:8px 0 0"><span class="req">*</span> Resident name is compulsory — an entry can't be saved without it.</p>
+<div class="carttotal"><span>Total for this entry</span><b id="cartTotal">₹0.00</b></div>
+<button class="btn pri big" id="saveCart">Save entry</button>
+<datalist id="itemList"></datalist>
+</div>
+<div class="card">
+<div class="row" style="margin-bottom:8px"><h2 style="margin:0" id="dayTitle">Entries</h2><span class="spacer"></span><span class="sub" id="dayTotal"></span></div>
+<div class="tblwrap"><table class="tbl cards" id="dayTbl"></table></div>
+</div>
+</section>
+<!-- REGISTER -->
+<section class="view" id="v-register">
+<div class="card">
+<div class="grid g3">
+<label class="f">Resident<select class="i" id="rRes"></select></label>
+<label class="f">Category<select class="i" id="rCat"><option value="">All categories</option></select></label>
+<label class="f">Search<input class="i" id="rSearch" placeholder="Item, vendor, bill no…"></label>
+</div>
+</div>
+<div class="card">
+<div class="row" style="margin-bottom:10px">
+<h2 style="margin:0" id="regTitle">Register</h2><span class="spacer"></span>
+<button class="btn sm" id="regXlsx">⬇ Excel (filtered)</button>
+</div>
+<div class="tblwrap"><table class="tbl cards" id="regTbl"></table></div>
+</div>
+</section>
+<!-- SUMMARY -->
+<section class="view" id="v-summary">
+<div class="kpis" id="kpis"></div>
+<div class="card">
+<h2>Download month <small id="sumMonthLbl"></small></h2>
+<div class="dlrow">
+<button class="btn pri" id="dlMonthXlsx">⬇ Month workbook (Excel)</button>
+<button class="btn" id="dlAllPdf">⬇ All resident bills (PDF)</button>
+<button class="btn" id="dlMonthCsv">⬇ All entries (CSV)</button>
+<button class="btn" id="copySum">⧉ Copy summary</button>
+</div>
+<p class="hint">Excel workbook has a Summary sheet, an All Entries sheet and one sheet per resident. The PDF has one bill page per resident — attach it to the monthly bill.</p>
+</div>
+<div class="card">
+<div class="row" style="margin-bottom:10px">
+<h2 style="margin:0">Resident-wise expense</h2><span class="spacer"></span>
+<label class="row sub" style="gap:6px;cursor:pointer"><input type="checkbox" id="showAll"> Show residents with no expense</label>
+</div>
+<div class="tblwrap"><table class="tbl" id="sumTbl"></table></div>
+</div>
+</section>
+<!-- RESIDENTS -->
+<section class="view" id="v-residents">
+<div class="card needwrite adminonly">
+<h2>Add resident</h2>
+<div class="grid" style="grid-template-columns:repeat(4,1fr)" id="nGrid">
+<label class="f"><span>Resident name <span class="req">*</span></span><input class="i" id="nName" placeholder="Resident name"></label>
+<label class="f"><span>TWC No. <span class="req">*</span></span><input class="i" id="nTwc" placeholder="e.g. TWC-0123" autocapitalize="characters"></label>
+<label class="f"><span>Room no. <span class="req">*</span></span><input class="i" id="nRoom" placeholder="e.g. 210" inputmode="numeric"></label>
+<label class="f">Bed<select class="i" id="nBed"><option value="A">A</option><option value="B">B</option><option value="S">Single</option><option value="">—</option></select></label>
+</div>
+<div style="margin-top:10px"><button class="btn pri" id="addRes">Add resident</button></div>
+</div>
+<div class="card">
+<div class="row" style="margin-bottom:6px"><h2 style="margin:0" id="resTitle">Residents</h2><span class="spacer"></span>
+<label class="row sub" style="gap:6px;cursor:pointer"><input type="checkbox" id="showDis"> Show discharged</label></div>
+<div class="reslist" id="resList"></div>
+<p class="hint">Marking a resident as discharged hides them from the entry form; their past expenses stay in the register.</p>
+</div>
+</section>
+</div></main>
+<div class="modal" id="modal"><div class="box" id="modalBox"></div></div>
+<div class="toast" id="toast"></div>
+<script>
+(function(){
+"use strict";
+const $=s=>document.querySelector(s);
+const CATS=["Fruits","Juices","Miscellaneous"];
+const CAT_CLASS={Fruits:"c-fruit",Juices:"c-juice",Miscellaneous:"c-misc"};
+const UNITS=["pcs","kg","g","dozen","ltr","ml","pkt","bottle","glass","box","plate"];
+const MN=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const ORG="Shubhan Agewell Pvt. Ltd. | ICI Building, 272/273, Sector 21, Nerul East, Navi Mumbai 400706";
+const LIBS={
+xlsx:["https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js","https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"],
+jspdf:["https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js","https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"],
+autotable:["https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js","https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.2/dist/jspdf.plugin.autotable.min.js"]
+};
+/* ---------- helpers ---------- */
+const pad=n=>String(n).padStart(2,"0");
+function today(){const d=new Date();return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate())}
+const monthOf=d=>String(d).slice(0,7);
+function fmtMonth(m){const p=m.split("-");return MN[+p[1]-1]+" "+p[0]}
+function fmtMonthFile(m){const p=m.split("-");return MN[+p[1]-1]+"-"+p[0]}
+function fmtDate(d){if(!d)return "";const p=d.split("-");return p[2]+"-"+MN[+p[1]-1]+"-"+p[0]}
+function shiftMonth(m,k){const p=m.split("-");const d=new Date(+p[0],+p[1]-1+k,1);return d.getFullYear()+"-"+pad(d.getMonth()+1)}
+const nf=new Intl.NumberFormat("en-IN",{minimumFractionDigits:2,maximumFractionDigits:2});
+const inr=n=>"₹"+nf.format(n||0);
+const rs=n=>nf.format(n||0);
+const round2=n=>Math.round((+n||0)*100)/100;
+function fmtQty(q){q=+q||0;return Number.isInteger(q)?String(q):String(round2(q))}
+function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function uid(p){return p+Date.now().toString(36)+Math.random().toString(36).slice(2,7)}
+function lsGet(k){try{return localStorage.getItem(k)}catch(e){return null}}
+function lsSet(k,v){try{localStorage.setItem(k,v)}catch(e){}}
+function safeName(s){return String(s).replace(/[^A-Za-z0-9]+/g,"_").replace(/^_|_$/g,"")}
+/* ---------- state ---------- */
+const API_URL="https://script.google.com/macros/s/AKfycbw6arNVBX6pCE1lLPPwiSxG7tTUx5TiTElPiTDDyzvTyWvOpH_gmMsBVVyMOOHLtZTNmA/exec";
+const S={api:true,me:null,token:lsGet("kx_token")||"",residents:[],catalog:{},entries:[],month:monthOf(today()),loaded:false,busy:0,tab:"add",lastSync:0};
+/* ---------- UI primitives ---------- */
+let toastT=null;
+function toast(msg,kind){const t=$("#toast");t.textContent=msg;t.className="toast on "+(kind||"");clearTimeout(toastT);toastT=setTimeout(()=>{t.className="toast"},3200)}
+function banner(msg,kind){const b=$("#banner");if(!msg){b.className="banner";b.textContent="";return}b.className="banner on "+(kind||"info");b.textContent=msg}
+function setStatus(kind,msg){const p=$("#status");p.className="pill "+kind;p.querySelector("span").textContent=msg}
+function openModal(html){$("#modalBox").innerHTML=html;$("#modal").classList.add("on")}
+function closeModal(){$("#modal").classList.remove("on");$("#modalBox").innerHTML=""}
+$("#modal").addEventListener("click",e=>{if(e.target.id==="modal")closeModal()});
+function confirmBox(title,msg,okLabel){
+return new Promise(res=>{
+openModal('<h3>'+esc(title)+'</h3><p class="muted" style="margin:0 0 16px">'+esc(msg)+'</p><div class="row" style="justify-content:flex-end"><button class="btn" id="cNo">Cancel</button><button class="btn pri" id="cYes" style="background:var(--danger);border-color:var(--danger)">'+esc(okLabel||"Delete")+'</button></div>');
+$("#cNo").onclick=()=>{closeModal();res(false)};
+$("#cYes").onclick=()=>{closeModal();res(true)};
+});
+}
+/* ---------- residents ---------- */
+const resById=id=>S.residents.find(r=>r.id===id);
+function roomLabel(r){if(!r)return "";return (r.bed&&r.bed!=="S"&&r.bed!=="A&B")?(r.room+"-"+r.bed):String(r.room)}
+function optLabel(r){const rl=roomLabel(r);return rl+" · "+r.name+(r.twc&&r.twc!==rl?" · "+r.twc:"")}
+const normTwc=s=>String(s||"").trim().toUpperCase().replace(/\s+/g,"");
+function twcTaken(twc,exceptId){const k=normTwc(twc);return S.residents.some(r=>r.id!==exceptId&&normTwc(r.twc)===k)}
+function floorOf(room){const n=parseInt(room,10);if(!n)return "Centre (TWC)";const f=Math.floor(n/100);const names=["Ground floor","1st floor","2nd floor","3rd floor","4th floor"];return names[f]||("Floor "+f)}
+function cmpRoom(a,b){const na=/^\d/.test(String(a)),nb=/^\d/.test(String(b));if(na!==nb)return na?1:-1;return String(a).localeCompare(String(b),undefined,{numeric:true})}
+function sortRes(a,b){return cmpRoom(a.room,b.room)||String(a.bed||"").localeCompare(String(b.bed||""))||a.name.localeCompare(b.name)}
+const activeResidents=()=>S.residents.filter(r=>r.status!=="discharged").sort(sortRes);
+function resOptions(allLabel,withDischarged){
+const act=activeResidents();
+let h='<option value="">'+esc(allLabel)+'</option>';
+let cur=null;
+act.forEach(r=>{const f=floorOf(r.room);if(f!==cur){if(cur!==null)h+="</optgroup>";h+='<optgroup label="'+esc(f)+'">';cur=f}
+h+='<option value="'+esc(r.id)+'">'+esc(optLabel(r))+'</option>'});
+if(cur!==null)h+="</optgroup>";
+if(withDischarged){const dis=S.residents.filter(r=>r.status==="discharged").sort(sortRes);
+if(dis.length){h+='<optgroup label="Discharged / left">'+dis.map(r=>'<option value="'+esc(r.id)+'">'+esc(optLabel(r))+'</option>').join("")+"</optgroup>"}}
+return h;
+}
+function fillSelect(sel,html){const v=sel.value;sel.innerHTML=html;if(v&&[...sel.options].some(o=>o.value===v))sel.value=v}
+/* ---------- entries ---------- */
+function monthEntries(){
+return S.entries.map(e=>{const r=resById(e.residentId);return Object.assign({},e,{_doc:"",residentName:r?r.name:(e.residentName||"?"),room:r?roomLabel(r):(e.room||""),twc:r?(r.twc||""):(e.twc||"")})})
+.sort((a,b)=>a.date<b.date?1:a.date>b.date?-1:(b.at||0)-(a.at||0));
+}
+const byDateAsc=(a,b)=>a.date<b.date?-1:a.date>b.date?1:(a.at||0)-(b.at||0);
+/* ---------- server (Google Apps Script) ---------- */
+async function post(body){
+  let r;
+  try{r=await fetch(API_URL,{method:"POST",body:JSON.stringify(body),headers:{"Content-Type":"text/plain;charset=utf-8"},credentials:"omit",redirect:"follow"})}
+  catch(e){throw new Error("No internet / server not reachable. Please try again.")}
+  let j;try{j=await r.json()}catch(e){throw new Error("Server error ("+r.status+"). Please try again.")}
+  return j;
+}
+async function call(fn){
+  const args=[].slice.call(arguments,1);
+  const j=await post({action:fn,token:S.token,args:args});
+  if(j.ok){if(j.me)setMe(j.me);return j.data}
+  if(j.code==="auth"){showLogin("Your login has expired. Please log in again.");const e=new Error("Please log in again.");e.auth=true;throw e}
+  throw new Error(j.error||"Something went wrong");
+}
+function setMe(me){S.me=Object.assign({},S.me||{},me);lsSet("kx_me",JSON.stringify(S.me));$("#fBy").value=S.me.name||"";document.body.classList.toggle("notadmin",S.me.role!=="admin")}
+function showLogin(msg){S.token="";lsSet("kx_token","");$("#login").classList.add("on");const n=$("#lgNote");if(msg){n.textContent=msg;n.classList.add("on")}else n.classList.remove("on");setTimeout(()=>{($("#lgId").value?$("#lgPin"):$("#lgId")).focus()},50)}
+async function doLogin(ev){
+  ev.preventDefault();
+  const id=$("#lgId").value.trim(),pin=$("#lgPin").value.trim(),n=$("#lgNote"),b=$("#lgBtn");
+  if(!id||!pin){n.textContent="Enter Login ID and PIN.";n.classList.add("on");return}
+  b.disabled=true;b.textContent="Checking…";
+  try{
+    const j=await post({action:"login",loginId:id,pin:pin});
+    if(!j.ok)throw new Error(j.error||"Login failed");
+    S.token=j.data.token;lsSet("kx_token",S.token);lsSet("kx_lastid",id);setMe({name:j.data.name,role:j.data.role});
+    $("#lgPin").value="";$("#login").classList.remove("on");toast("Welcome, "+j.data.name);
+    subscribeMonth();
+  }catch(e){n.textContent=cleanMsg(e);n.classList.add("on");$("#lgPin").value=""}
+  finally{b.disabled=false;b.textContent="Log in"}
+}
+function hhmm(){const d=new Date();return pad(d.getHours())+":"+pad(d.getMinutes())}
+function apply(data){
+if(!data)return;
+S.residents=(data.residents||[]).map(r=>Object.assign({},r));
+const cat={};(data.items||[]).forEach(i=>{cat[String(i.name).toLowerCase()]=i});S.catalog=cat;
+if(data.month===S.month){S.entries=data.entries||[];S.loaded=true}
+S.lastSync=Date.now();setStatus("ok","Synced "+hhmm());banner("");
+renderSelects();renderResidents();renderItemList();renderData();
+}
+async function busy(fn){S.busy++;setStatus("","Saving…");try{return await fn()}finally{S.busy--}}
+function cleanMsg(e){return String((e&&e.message)||e||"Something went wrong").replace(/^Exception:\s*/,"").replace(/^Error:\s*/,"")}
+function handleWriteErr(e){console.error(e);setStatus("err","Not saved");toast(cleanMsg(e),"err")}
+function needDb(){if(!S.api){toast("Open this page from the web-app link to save.","err");return false}return true}
+function saveResidents(list){return busy(()=>call("saveResidents",list,S.month)).then(apply)}
+let loadSeq=0;
+function subscribeMonth(){
+S.entries=[];S.loaded=false;renderData();
+if(!S.token)return;
+const my=++loadSeq;setStatus("","Loading…");
+call("getData",S.month).then(d=>{if(my===loadSeq)apply(d)}).catch(e=>{if(my!==loadSeq||e.auth)return;setStatus("err","Offline");banner("Couldn't load data: "+cleanMsg(e)+" — check internet and tap Refresh.","err")});
+}
+function refreshQuiet(){if(!S.token||S.busy||$("#modal").classList.contains("on")||document.hidden)return;const my=++loadSeq;call("getData",S.month).then(d=>{if(my===loadSeq&&!S.busy)apply(d)}).catch(()=>{})}
+/* ---------- cart (add form) ---------- */
+function catOptions(sel){return CATS.map(c=>'<option'+(c===sel?" selected":"")+'>'+c+'</option>').join("")}
+function unitOptions(sel){return UNITS.map(u=>'<option'+(u===sel?" selected":"")+'>'+u+'</option>').join("")}
+function addCartRow(pre){
+pre=pre||{};
+const d=document.createElement("div");d.className="ci";
+d.innerHTML='<label class="f">Category<select class="i c-cat">'+catOptions(pre.cat||"Fruits")+'</select></label>'+
+'<label class="f itm">Item<input class="i c-item" list="itemList" placeholder="e.g. Apple, Orange juice" autocomplete="off"></label>'+
+'<label class="f">Qty<input class="i c-qty" type="number" inputmode="decimal" min="0" step="any" value="1"></label>'+
+'<label class="f">Unit<select class="i c-unit">'+unitOptions(pre.unit||"pcs")+'</select></label>'+
+'<label class="f">MRP / unit ₹<input class="i c-mrp" type="number" inputmode="decimal" min="0" step="any" placeholder="0.00"></label>'+
+'<div class="amt c-amt">₹0.00</div>'+
+'<button class="rm" title="Remove item" aria-label="Remove item">×</button>';
+$("#cart").appendChild(d);
+const it=d.querySelector(".c-item");
+it.addEventListener("change",()=>{const c=S.catalog[it.value.trim().toLowerCase()];if(c){d.querySelector(".c-cat").value=CATS.includes(c.category)?c.category:"Miscellaneous";if(UNITS.includes(c.unit))d.querySelector(".c-unit").value=c.unit;const m=d.querySelector(".c-mrp");if(!m.value&&c.mrp!=null)m.value=c.mrp;calcCart()}});
+d.addEventListener("input",calcCart);
+d.querySelector(".rm").onclick=()=>{if($("#cart").children.length>1){d.remove();calcCart()}else{it.value="";d.querySelector(".c-mrp").value="";d.querySelector(".c-qty").value="1";calcCart()}};
+calcCart();
+return d;
+}
+function readCart(){return [...$("#cart").children].map(d=>({el:d,cat:d.querySelector(".c-cat").value,item:d.querySelector(".c-item").value.trim(),qty:parseFloat(d.querySelector(".c-qty").value),unit:d.querySelector(".c-unit").value,mrp:parseFloat(d.querySelector(".c-mrp").value)}))}
+function calcCart(){let t=0;for(const r of readCart()){const a=(r.qty>0&&r.mrp>=0)?round2(r.qty*r.mrp):0;r.el.querySelector(".c-amt").textContent=inr(a);t+=a}$("#cartTotal").textContent=inr(t)}
+async function saveCart(){
+if(!needDb())return;
+const date=$("#fDate").value,resId=$("#fRes").value,by=$("#fBy").value.trim();
+if(!date)return toast("Select a date","warn");
+if(!resId||!resById(resId)){markRes(true);$("#fRes").scrollIntoView({behavior:"smooth",block:"center"});$("#fRes").focus();return toast("Resident name is compulsory — select a resident","err")}
+const rows=readCart().filter(r=>r.item||r.mrp>0);
+if(!rows.length)return toast("Add at least one item","warn");
+for(const r of rows){
+if(!r.item){r.el.querySelector(".c-item").focus();return toast("Item name is missing","warn")}
+if(!(r.qty>0)){r.el.querySelector(".c-qty").focus();return toast("Enter quantity for "+r.item,"warn")}
+if(!(r.mrp>=0)||isNaN(r.mrp)){r.el.querySelector(".c-mrp").focus();return toast("Enter MRP for "+r.item,"warn")}
+}
+
+const vendor=$("#fVendor").value.trim(),billNo=$("#fBill").value.trim(),remarks=$("#fRemarks").value.trim();
+const now=Date.now();
+const entries=rows.map((r,i)=>({id:uid("e"),date:date,category:r.cat,item:r.item,qty:r.qty,unit:r.unit,mrp:round2(r.mrp),amount:round2(r.qty*r.mrp),vendor:vendor,billNo:billNo,remarks:remarks,by:by,at:now+i}));
+const btn=$("#saveCart");btn.disabled=true;btn.textContent="Saving…";
+try{
+const data=await busy(()=>call("addEntries",{date:date,residentId:resId,by:by,vendor:vendor,billNo:billNo,remarks:remarks,items:rows.map(r=>({category:r.cat,item:r.item,qty:r.qty,unit:r.unit,mrp:round2(r.mrp)}))},S.month));
+apply(data);
+const r=resById(resId);
+toast("Saved "+entries.length+" item"+(entries.length>1?"s":"")+" for "+(r?r.name:"resident")+" · "+inr(entries.reduce((s,e)=>s+e.amount,0)));
+$("#cart").innerHTML="";addCartRow();$("#fBill").value="";$("#fRemarks").value="";
+$("#cart .c-item").focus();
+}catch(e){handleWriteErr(e)}
+finally{btn.disabled=false;btn.textContent="Save entry";syncSaveBtn()}
+}
+function markRes(bad){$("#fRes").classList.toggle("bad",bad);$("#fResNote").classList.toggle("on",bad)}
+function syncSaveBtn(){const ok=!!$("#fRes").value;const b=$("#saveCart");if(b.textContent==="Saving…")return;b.textContent=ok?"Save entry":"Select resident name to save";b.style.opacity=ok?"":".65";if(ok)markRes(false)}
+/* ---------- rendering ---------- */
+function catChip(c){return '<span class="chip '+(CAT_CLASS[c]||"c-misc")+'">'+esc(c)+'</span>'}
+function entryRows(list,showWho){
+return list.map(e=>'<tr>'+
+'<td data-k="hide">'+esc(fmtDate(e.date))+'</td>'+
+(showWho?'<td data-k="who"><span class="roomtag">'+esc(e.room)+'</span> '+esc(e.residentName)+(e.twc?' <span class="twc">'+esc(e.twc)+'</span>':'')+'</td>':'')+
+'<td data-k="item">'+esc(e.item)+'<div class="sub">'+catChip(e.category)+' '+esc(fmtQty(e.qty))+' '+esc(e.unit)+' × '+inr(e.mrp)+'</div></td>'+
+'<td data-k="meta" class="sub">'+esc(fmtDate(e.date))+(e.vendor?' · '+esc(e.vendor):'')+(e.billNo?' · Bill '+esc(e.billNo):'')+(e.remarks?' · '+esc(e.remarks):'')+(e.by?' · by '+esc(e.by):'')+'</td>'+
+'<td data-k="amt" class="n">'+inr(e.amount)+'</td>'+
+'<td data-k="act" class="n needwrite"><button class="btn sm ghost" data-act="edit" data-doc="'+esc(e._doc)+'" data-id="'+esc(e.id)+'">Edit</button><button class="btn sm ghost dan" data-act="del" data-doc="'+esc(e._doc)+'" data-id="'+esc(e.id)+'">Delete</button></td>'+
+'</tr>').join("");
+}
+function entryHead(showWho){return '<thead><tr><th>Date</th>'+(showWho?'<th>Resident</th>':'')+'<th>Item</th><th>Details</th><th class="n">Amount</th><th class="needwrite"></th></tr></thead>'}
+function loadingOr(msg){return S.api&&!S.loaded?'Loading…':msg}
+function renderDay(){
+const date=$("#fDate").value;const resId=$("#fRes").value;
+let list=monthEntries().filter(e=>e.date===date);
+if(resId)list=list.filter(e=>e.residentId===resId);
+const r=resId?resById(resId):null;
+$("#dayTitle").textContent=(r?r.name+" — ":"")+"Entries on "+fmtDate(date);
+const t=list.reduce((s,e)=>s+e.amount,0);
+$("#dayTotal").textContent=list.length?list.length+(list.length===1?" item · ":" items · ")+inr(t):"";
+$("#dayTbl").innerHTML=list.length?entryHead(true)+"<tbody>"+entryRows(list,true)+"</tbody>":'<tbody><tr><td class="empty">'+loadingOr("No entries yet for this day.")+'</td></tr></tbody>';
+}
+function regFiltered(){
+const resF=$("#rRes").value,catF=$("#rCat").value,q=$("#rSearch").value.trim().toLowerCase();
+return monthEntries().filter(e=>(!resF||e.residentId===resF)&&(!catF||e.category===catF)&&(!q||[e.item,e.residentName,e.room,e.twc,e.vendor,e.billNo,e.remarks,e.by].join(" ").toLowerCase().includes(q)));
+}
+function renderRegister(){
+const list=regFiltered();const t=list.reduce((s,e)=>s+e.amount,0);
+$("#regTitle").textContent="Register — "+fmtMonth(S.month)+" ("+list.length+")";
+$("#regTbl").innerHTML=list.length?entryHead(true)+"<tbody>"+entryRows(list,true)+'</tbody><tfoot><tr><td data-k="hide"></td><td>Total</td><td data-k="hide"></td><td data-k="hide"></td><td class="n">'+inr(t)+'</td><td data-k="hide" class="needwrite"></td></tr></tfoot>':'<tbody><tr><td class="empty">'+loadingOr("No entries for this filter in "+fmtMonth(S.month)+".")+'</td></tr></tbody>';
+}
+function summaryRows(includeZero){
+const map={};
+const blank=(id,name,room,twc)=>({residentId:id,name:name,room:room,twc:twc||"",Fruits:0,Juices:0,Miscellaneous:0,total:0,count:0});
+for(const e of monthEntries()){const m=map[e.residentId]||(map[e.residentId]=blank(e.residentId,e.residentName,e.room,e.twc));
+const c=CATS.includes(e.category)?e.category:"Miscellaneous";m[c]+=e.amount;m.total+=e.amount;m.count++}
+if(includeZero)for(const r of activeResidents())if(!map[r.id])map[r.id]=blank(r.id,r.name,roomLabel(r),r.twc);
+return Object.values(map).map(m=>{CATS.forEach(c=>m[c]=round2(m[c]));m.total=round2(m.total);return m}).sort((a,b)=>cmpRoom(a.room,b.room)||a.name.localeCompare(b.name));
+}
+function renderSummary(){
+const rows=summaryRows($("#showAll").checked);
+const all=monthEntries();const tot=all.reduce((s,e)=>s+e.amount,0);
+const catT={};CATS.forEach(c=>catT[c]=0);all.forEach(e=>{catT[CATS.includes(e.category)?e.category:"Miscellaneous"]+=e.amount});
+const billed=new Set(all.map(e=>e.residentId)).size;
+$("#kpis").innerHTML='<div class="kpi k1"><div class="l">'+esc(fmtMonth(S.month))+' total · '+billed+' resident'+(billed===1?'':'s')+'</div><div class="v">'+inr(tot)+'</div></div>'+
+'<div class="kpi"><div class="l">Fruits</div><div class="v" style="color:var(--fruit)">'+inr(catT.Fruits)+'</div></div>'+
+'<div class="kpi"><div class="l">Juices</div><div class="v" style="color:var(--juice)">'+inr(catT.Juices)+'</div></div>'+
+'<div class="kpi"><div class="l">Miscellaneous</div><div class="v" style="color:var(--misc)">'+inr(catT.Miscellaneous)+'</div></div>';
+$("#sumMonthLbl").textContent=fmtMonth(S.month);
+if(!rows.length){$("#sumTbl").innerHTML='<tbody><tr><td class="empty">'+loadingOr("No expenses recorded for "+fmtMonth(S.month)+" yet.")+'</td></tr></tbody>';return}
+let h='<thead><tr><th>Room</th><th>Resident</th><th class="n hm">Fruits</th><th class="n hm">Juices</th><th class="n hm">Misc</th><th class="n">Total</th><th>Download bill</th></tr></thead><tbody>';
+for(const r of rows){h+='<tr><td><span class="roomtag">'+esc(r.room)+'</span></td><td><b>'+esc(r.name)+'</b>'+(r.twc?' <span class="twc">'+esc(r.twc)+'</span>':'')+'<div class="sub">'+r.count+' item'+(r.count===1?'':'s')+'</div><div class="sub sm-only">'+CATS.filter(c=>r[c]).map(c=>(c==="Miscellaneous"?"Misc":c)+' '+rs(r[c])).join(' · ')+'</div></td>'+
+'<td class="n hm">'+(r.Fruits?rs(r.Fruits):'–')+'</td><td class="n hm">'+(r.Juices?rs(r.Juices):'–')+'</td><td class="n hm">'+(r.Miscellaneous?rs(r.Miscellaneous):'–')+'</td><td class="n"><b>'+inr(r.total)+'</b></td>'+
+'<td class="dlc">'+(r.count?'<div class="row" style="gap:4px"><button class="btn sm" data-act="rpdf" data-res="'+esc(r.residentId)+'">PDF</button><button class="btn sm" data-act="rxlsx" data-res="'+esc(r.residentId)+'">Excel</button><button class="btn sm ghost" data-act="rview" data-res="'+esc(r.residentId)+'">View</button></div>':'<span class="sub">—</span>')+'</td></tr>'}
+h+='</tbody><tfoot><tr><td></td><td>Total</td><td class="n hm">'+rs(catT.Fruits)+'</td><td class="n hm">'+rs(catT.Juices)+'</td><td class="n hm">'+rs(catT.Miscellaneous)+'</td><td class="n">'+inr(tot)+'</td><td></td></tr></tfoot>';
+$("#sumTbl").innerHTML=h;
+}
+function renderResidents(){
+const showDis=$("#showDis").checked;
+const list=S.residents.filter(r=>showDis||r.status!=="discharged").sort((a,b)=>(a.status==="discharged")-(b.status==="discharged")||sortRes(a,b));
+const act=activeResidents().length;
+const miss=activeResidents().filter(r=>!r.twc).length;
+$("#resTitle").textContent="Residents ("+act+" active"+(miss?" · "+miss+" without TWC":"")+")";
+if(!list.length){$("#resList").innerHTML='<div class="empty">'+(S.api&&!S.loaded?"Loading…":"No residents yet — add them above.")+'</div>';return}
+let h="",cur=null;
+for(const r of list){const f=r.status==="discharged"?"Discharged / left":floorOf(r.room);if(f!==cur){h+='<div class="floorh">'+esc(f)+'</div>';cur=f}
+h+='<div class="rr"><span class="roomtag">'+esc(roomLabel(r))+'</span><div class="rinfo"><div class="rn">'+esc(r.name)+'</div>'+(r.twc?'<span class="twc">'+esc(r.twc)+'</span>':'<span class="twc miss">TWC missing</span>')+(r.status==="discharged"?' <span class="chip c-off">Discharged</span>':'')+'</div><div class="ract">'+
+'<button class="btn sm ghost needwrite adminonly" data-act="redit" data-res="'+esc(r.id)+'">Edit</button>'+
+(r.status==="discharged"?'<button class="btn sm ghost needwrite adminonly" data-act="ron" data-res="'+esc(r.id)+'">Re-activate</button>':'<button class="btn sm ghost dan needwrite adminonly" data-act="roff" data-res="'+esc(r.id)+'">Discharge</button>')+'</div></div>'}
+$("#resList").innerHTML=h;
+}
+function renderSelects(){
+fillSelect($("#fRes"),resOptions("— Select resident name —",false));syncSaveBtn();
+fillSelect($("#rRes"),resOptions("All residents",true));
+}
+function renderItemList(){
+const items=Object.values(S.catalog).sort((a,b)=>(b.n||0)-(a.n||0)||a.name.localeCompare(b.name));
+$("#itemList").innerHTML=items.map(i=>'<option value="'+esc(i.name)+'">'+esc(i.category)+(i.mrp!=null?' · ₹'+esc(i.mrp):'')+'</option>').join("");
+}
+function renderData(){
+const tot=monthEntries().reduce((s,e)=>s+e.amount,0);
+$("#mTotal").textContent=inr(tot);
+renderDay();renderRegister();renderSummary();
+}
+/* ---------- edit entry ---------- */
+function findEntry(docId,id){const e=S.entries.find(x=>x.id===id);return e?{doc:{residentId:e.residentId,month:e.month},entry:e}:null}
+function openEdit(docId,id){
+const f=findEntry(docId,id);if(!f)return toast("Entry not found — it may have been changed.","warn");
+const e=f.entry;
+openModal('<h3>Edit entry</h3><div class="grid g2">'+
+'<label class="f">Date<input class="i" type="date" id="eDate" value="'+esc(e.date)+'"></label>'+
+'<label class="f">Resident<select class="i" id="eRes">'+resOptions("— Select —",true)+'</select></label>'+
+'<label class="f">Category<select class="i" id="eCat">'+catOptions(e.category)+'</select></label>'+
+'<label class="f">Item<input class="i" id="eItem" list="itemList" value="'+esc(e.item)+'"></label>'+
+'<label class="f">Qty<input class="i" id="eQty" type="number" step="any" inputmode="decimal" value="'+esc(e.qty)+'"></label>'+
+'<label class="f">Unit<select class="i" id="eUnit">'+unitOptions(e.unit)+'</select></label>'+
+'<label class="f">MRP / unit ₹<input class="i" id="eMrp" type="number" step="any" inputmode="decimal" value="'+esc(e.mrp)+'"></label>'+
+'<label class="f">Vendor<input class="i" id="eVendor" value="'+esc(e.vendor)+'"></label>'+
+'<label class="f">Bill / ref no.<input class="i" id="eBill" value="'+esc(e.billNo)+'"></label>'+
+'<label class="f">Remarks<input class="i" id="eRemarks" value="'+esc(e.remarks)+'"></label>'+
+'</div><div class="carttotal"><span>Amount</span><b id="eAmt"></b></div>'+
+'<div class="row" style="justify-content:flex-end"><button class="btn" id="eCancel">Cancel</button><button class="btn pri" id="eSave">Save changes</button></div>');
+$("#eRes").value=f.doc.residentId;
+const upd=()=>{$("#eAmt").textContent=inr(round2((parseFloat($("#eQty").value)||0)*(parseFloat($("#eMrp").value)||0)))};upd();
+$("#eQty").oninput=upd;$("#eMrp").oninput=upd;
+$("#eCancel").onclick=closeModal;
+$("#eSave").onclick=async()=>{
+if(!needDb())return;
+const patch={date:$("#eDate").value,category:$("#eCat").value,item:$("#eItem").value.trim(),qty:parseFloat($("#eQty").value),unit:$("#eUnit").value,mrp:round2(parseFloat($("#eMrp").value)),vendor:$("#eVendor").value.trim(),billNo:$("#eBill").value.trim(),remarks:$("#eRemarks").value.trim()};
+const newRes=$("#eRes").value;
+if(!newRes){$("#eRes").classList.add("bad");return toast("Resident name is compulsory","err")}
+if(!patch.date||!patch.item||!(patch.qty>0)||!(patch.mrp>=0))return toast("Fill date, item, qty and MRP","warn");
+const newMonth=monthOf(patch.date);
+$("#eSave").disabled=true;
+try{
+apply(await busy(()=>call("updateEntry",e.id,patch,newRes,S.month)));
+closeModal();toast("Entry updated"+(newMonth!==S.month?" (moved to "+fmtMonth(newMonth)+")":""));
+}catch(err){handleWriteErr(err);$("#eSave").disabled=false}
+};
+}
+/* ---------- delete password (checked on the server) ---------- */
+async function deleteEntry(docId,id){
+const f=findEntry(docId,id);if(!f)return;
+if(!needDb())return;
+const e=f.entry;
+openModal('<h3>Delete this entry?</h3><p class="muted" style="margin:0 0 12px">'+esc(e.item+" · "+inr(e.amount)+" · "+fmtDate(e.date))+' — this can\'t be undone. Enter the delete password to continue.</p>'+
+'<label class="f"><span>Delete password <span class="req">*</span></span><input class="i" type="password" id="pwIn" inputmode="numeric" autocomplete="off" placeholder="Enter password"></label>'+
+'<span class="reqnote" id="pwNote"></span>'+
+'<div class="row" style="justify-content:flex-end;margin-top:14px"><button class="btn" id="pwNo">Cancel</button><button class="btn pri" id="pwYes" style="background:var(--danger);border-color:var(--danger)">Delete</button></div>');
+const inp=$("#pwIn"),note=$("#pwNote"),yes=$("#pwYes");setTimeout(()=>inp.focus(),50);
+const fail=m=>{inp.classList.add("bad");note.textContent=m;note.classList.add("on");inp.value="";inp.focus()};
+const go=async()=>{
+if(!inp.value)return fail("Password is required to delete.");
+yes.disabled=true;yes.textContent="Checking…";
+try{const d=await busy(()=>call("deleteEntry",id,inp.value,S.month));closeModal();apply(d);toast("Entry deleted")}
+catch(err){setStatus("ok","Synced "+hhmm());yes.disabled=false;yes.textContent="Delete";fail(cleanMsg(err))}
+};
+yes.onclick=go;
+inp.addEventListener("keydown",ev=>{if(ev.key==="Enter")go()});
+$("#pwNo").onclick=closeModal;
+}
+/* ---------- residents edit ---------- */
+async function addResident(){
+if(!needDb())return;
+const name=$("#nName").value.trim(),room=$("#nRoom").value.trim(),bed=$("#nBed").value,twc=normTwc($("#nTwc").value);
+["#nName","#nTwc","#nRoom"].forEach(s=>$(s).classList.toggle("bad",!$(s).value.trim()));
+if(!name)return toast("Resident name is compulsory","err");
+if(!twc)return toast("TWC No. is compulsory","err");
+if(!room)return toast("Room no. is compulsory","err");
+if(twcTaken(twc)){$("#nTwc").classList.add("bad");return toast("TWC No. "+twc+" is already given to another resident","err")}
+const list=S.residents.map(r=>Object.assign({},r));
+list.push({id:uid("r"),name:name,twc:twc,room:room,bed:bed,status:"active"});
+try{await saveResidents(list);["#nName","#nRoom","#nTwc"].forEach(s=>$(s).value="");toast(name+" added")}catch(e){handleWriteErr(e)}
+}
+async function setResStatus(id,status){
+if(!needDb())return;
+const r=resById(id);if(!r)return;
+if(status==="discharged"){const ok=await confirmBox("Mark "+r.name+" as discharged?","They'll be hidden from the entry form. Past expenses stay in the register.","Discharge");if(!ok)return}
+const list=S.residents.map(x=>x.id===id?Object.assign({},x,{status:status}):Object.assign({},x));
+try{await saveResidents(list);toast(r.name+(status==="discharged"?" marked discharged":" re-activated"))}catch(e){handleWriteErr(e)}
+}
+function editResident(id){
+const r=resById(id);if(!r)return;
+openModal('<h3>Edit resident</h3><div class="grid">'+
+'<label class="f"><span>Resident name <span class="req">*</span></span><input class="i" id="xName" value="'+esc(r.name)+'"></label>'+
+'<label class="f"><span>TWC No. <span class="req">*</span></span><input class="i" id="xTwc" value="'+esc(r.twc||"")+'" placeholder="e.g. TWC-0123" autocapitalize="characters"></label>'+
+'<div class="grid g2"><label class="f"><span>Room no. <span class="req">*</span></span><input class="i" id="xRoom" value="'+esc(r.room)+'"></label>'+
+'<label class="f">Bed<select class="i" id="xBed"><option value="A">A</option><option value="B">B</option><option value="S">Single</option><option value="A&amp;B">A &amp; B (whole room)</option><option value="">—</option></select></label></div>'+
+'</div><p class="hint">Changing the room updates it everywhere, including past entries in this month\'s register.</p><div class="row" style="justify-content:flex-end;margin-top:10px"><button class="btn" id="xCancel">Cancel</button><button class="btn pri" id="xSave">Save</button></div>');
+$("#xBed").value=r.bed||"";
+$("#xCancel").onclick=closeModal;
+$("#xSave").onclick=async()=>{
+if(!needDb())return;
+const name=$("#xName").value.trim(),room=$("#xRoom").value.trim(),twc=normTwc($("#xTwc").value);
+["#xName","#xTwc","#xRoom"].forEach(s=>$(s).classList.toggle("bad",!$(s).value.trim()));
+if(!name)return toast("Resident name is compulsory","err");
+if(!twc)return toast("TWC No. is compulsory","err");
+if(!room)return toast("Room no. is compulsory","err");
+if(twcTaken(twc,id)){$("#xTwc").classList.add("bad");return toast("TWC No. "+twc+" is already given to another resident","err")}
+const list=S.residents.map(x=>x.id===id?Object.assign({},x,{name:name,twc:twc,room:room,bed:$("#xBed").value}):Object.assign({},x));
+try{await saveResidents(list);closeModal();toast("Resident updated")}catch(e){handleWriteErr(e)}
+};
+}
+/* ---------- exports ---------- */
+const loadedLibs={};
+function loadScript(u){return loadedLibs[u]||(loadedLibs[u]=new Promise((res,rej)=>{const s=document.createElement("script");s.src=u;s.onload=()=>res();s.onerror=()=>{delete loadedLibs[u];rej(new Error("Couldn't load "+u))};document.head.appendChild(s)}))}
+async function loadAny(urls){let last;for(const u of urls){try{return await loadScript(u)}catch(e){last=e}}throw last}
+async function needXlsx(){await loadAny(LIBS.xlsx);if(!window.XLSX)throw new Error("xlsx");return window.XLSX}
+async function needPdf(){await loadAny(LIBS.jspdf);await loadAny(LIBS.autotable);if(!window.jspdf||!window.jspdf.jsPDF)throw new Error("jspdf");return window.jspdf.jsPDF}
+async function offerFile(filename,data){
+const blob=data instanceof Blob?data:new Blob([data],{type:"application/octet-stream"});
+const u=URL.createObjectURL(blob);const a=document.createElement("a");a.href=u;a.download=filename;a.rel="noopener";
+document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(u);a.remove()},5000);
+toast("Downloading "+filename);
+}
+const ENTRY_HEAD=["Date","Room","Resident","TWC No.","Category","Item","Qty","Unit","MRP (Rs.)","Amount (Rs.)","Vendor","Bill / Ref No.","Remarks","Entered by"];
+const entryRow=e=>[fmtDate(e.date),e.room,e.residentName,e.twc||"",e.category,e.item,+e.qty,e.unit,+e.mrp,+e.amount,e.vendor||"",e.billNo||"",e.remarks||"",e.by||""];
+function csvOf(rows){return "﻿"+rows.map(r=>r.map(v=>{const s=String(v==null?"":v);return /[",\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s}).join(",")).join("\r\n")}
+function sheetName(s,used){let n=String(s).replace(/[\[\]:*?\/\\]/g," ").slice(0,31).trim()||"Sheet";let b=n,i=2;while(used.has(n.toLowerCase())){const suf=" ("+i+++")";n=b.slice(0,31-suf.length)+suf}used.add(n.toLowerCase());return n}
+function residentSheetAoa(name,room,list,twc){
+const aoa=[["The Wisdom Club - Nerul | Kitchen Expense Statement"],["Resident: "+name,"","TWC No.: "+(twc||"-"),"","Room: "+room,"","Period: "+fmtMonth(S.month)],[],["Date","Category","Item","Qty","Unit","MRP (Rs.)","Amount (Rs.)","Vendor","Bill / Ref No.","Remarks"]];
+list.forEach(e=>aoa.push([fmtDate(e.date),e.category,e.item,+e.qty,e.unit,+e.mrp,+e.amount,e.vendor||"",e.billNo||"",e.remarks||""]));
+aoa.push([]);
+CATS.forEach(c=>aoa.push(["","",c+" subtotal","","","",round2(list.filter(e=>e.category===c).reduce((s,e)=>s+e.amount,0))]));
+aoa.push(["","","GRAND TOTAL","","","",round2(list.reduce((s,e)=>s+e.amount,0))]);
+return aoa;
+}
+function withCols(X,aoa,widths){const ws=X.utils.aoa_to_sheet(aoa);ws["!cols"]=widths.map(w=>({wch:w}));return ws}
+async function exportMonthXlsx(){
+const all=monthEntries().sort(byDateAsc);
+if(!all.length)return toast("No entries in "+fmtMonth(S.month),"warn");
+let X;try{X=await needXlsx()}catch(e){toast("Excel library couldn't load — downloading CSV instead.","warn");return exportMonthCsv()}
+const wb=X.utils.book_new();const used=new Set();
+const sum=summaryRows(false);
+const sAoa=[["Kitchen Expense Summary - "+fmtMonth(S.month)+" - The Wisdom Club Nerul"],[],["Room","Resident","TWC No.","Fruits","Juices","Miscellaneous","Total (Rs.)","Items"]];
+sum.forEach(r=>sAoa.push([r.room,r.name,r.twc||"",r.Fruits,r.Juices,r.Miscellaneous,r.total,r.count]));
+sAoa.push(["","TOTAL","",round2(sum.reduce((s,r)=>s+r.Fruits,0)),round2(sum.reduce((s,r)=>s+r.Juices,0)),round2(sum.reduce((s,r)=>s+r.Miscellaneous,0)),round2(sum.reduce((s,r)=>s+r.total,0)),sum.reduce((s,r)=>s+r.count,0)]);
+X.utils.book_append_sheet(wb,withCols(X,sAoa,[8,26,12,12,12,14,14,8]),sheetName("Summary",used));
+const aAoa=[ENTRY_HEAD].concat(all.map(entryRow));aAoa.push(["","","","","","TOTAL","","","",round2(all.reduce((s,e)=>s+e.amount,0))]);
+X.utils.book_append_sheet(wb,withCols(X,aAoa,[12,7,22,12,13,24,6,7,10,12,18,12,18,12]),sheetName("All Entries",used));
+for(const r of sum){const list=all.filter(e=>e.residentId===r.residentId);
+X.utils.book_append_sheet(wb,withCols(X,residentSheetAoa(r.name,r.room,list,r.twc),[12,13,24,6,7,10,12,18,12,18]),sheetName(r.room+" "+r.name,used))}
+const buf=X.write(wb,{bookType:"xlsx",type:"array"});
+await offerFile("Kitchen_Expense_"+fmtMonthFile(S.month)+".xlsx",buf);
+}
+async function exportMonthCsv(){
+const all=monthEntries().sort(byDateAsc);
+if(!all.length)return toast("No entries in "+fmtMonth(S.month),"warn");
+await offerFile("Kitchen_Expense_"+fmtMonthFile(S.month)+".csv",csvOf([ENTRY_HEAD].concat(all.map(entryRow))));
+}
+async function exportFilteredXlsx(){
+const list=regFiltered().sort(byDateAsc);
+if(!list.length)return toast("Nothing to download for this filter","warn");
+const resF=$("#rRes").value;const r=resF?resById(resF):null;
+const base="Kitchen_Expense_"+fmtMonthFile(S.month)+(r?"_"+safeName(r.name):"")+($("#rCat").value?"_"+$("#rCat").value:"");
+const rows=[ENTRY_HEAD].concat(list.map(entryRow));rows.push(["","","","","","TOTAL","","","",round2(list.reduce((s,e)=>s+e.amount,0))]);
+let X;try{X=await needXlsx()}catch(e){return offerFile(base+".csv",csvOf(rows))}
+const wb=X.utils.book_new();X.utils.book_append_sheet(wb,withCols(X,rows,[12,7,22,12,13,24,6,7,10,12,18,12,18,12]),"Entries");
+await offerFile(base+".xlsx",X.write(wb,{bookType:"xlsx",type:"array"}));
+}
+function resInfo(resId){const list=monthEntries().filter(e=>e.residentId===resId).sort(byDateAsc);const r=resById(resId);return {list:list,name:r?r.name:(list[0]?list[0].residentName:"Resident"),room:r?roomLabel(r):(list[0]?list[0].room:""),twc:r?(r.twc||""):(list[0]?list[0].twc||"":"")}}
+async function exportResidentXlsx(resId){
+const ri=resInfo(resId);if(!ri.list.length)return toast("No entries for this resident","warn");
+const fname="Kitchen_Bill_"+(ri.twc?safeName(ri.twc)+"_":"")+safeName(ri.room)+"_"+safeName(ri.name)+"_"+fmtMonthFile(S.month);
+let X;try{X=await needXlsx()}catch(e){toast("Excel library couldn't load — downloading CSV.","warn");return offerFile(fname+".csv",csvOf([ENTRY_HEAD].concat(ri.list.map(entryRow))))}
+const wb=X.utils.book_new();X.utils.book_append_sheet(wb,withCols(X,residentSheetAoa(ri.name,ri.room,ri.list,ri.twc),[12,13,24,6,7,10,12,18,12,18]),"Statement");
+await offerFile(fname+".xlsx",X.write(wb,{bookType:"xlsx",type:"array"}));
+}
+function inWords(num){
+const a=["","One","Two","Three","Four","Five","Six","Seven","Eight","Nine","Ten","Eleven","Twelve","Thirteen","Fourteen","Fifteen","Sixteen","Seventeen","Eighteen","Nineteen"];
+const b=["","","Twenty","Thirty","Forty","Fifty","Sixty","Seventy","Eighty","Ninety"];
+const two=n=>n<20?a[n]:b[Math.floor(n/10)]+(n%10?" "+a[n%10]:"");
+const three=n=>{const h=Math.floor(n/100),r=n%100;return (h?a[h]+" Hundred"+(r?" ":""):"")+(r?two(r):"")};
+function conv(n){if(n===0)return "Zero";let s="";const cr=Math.floor(n/1e7);n%=1e7;const l=Math.floor(n/1e5);n%=1e5;const t=Math.floor(n/1e3);n%=1e3;
+if(cr)s+=conv(cr)+" Crore ";if(l)s+=two(l)+" Lakh ";if(t)s+=two(t)+" Thousand ";if(n)s+=three(n);return s.trim()}
+num=round2(num);const r=Math.floor(num),p=Math.round((num-r)*100);
+return "Rupees "+conv(r)+(p?" and "+two(p)+" Paise":"")+" Only";
+}
+function drawBill(doc,ri){
+const W=doc.internal.pageSize.getWidth(),H=doc.internal.pageSize.getHeight();
+doc.setFillColor(15,92,84);doc.rect(0,0,W,24,"F");
+doc.setTextColor(255,255,255);doc.setFont("helvetica","bold");doc.setFontSize(15);doc.text("THE WISDOM CLUB - NERUL",14,11);
+doc.setFont("helvetica","normal");doc.setFontSize(8);doc.text(ORG,14,18);
+doc.setTextColor(28,40,38);doc.setFont("helvetica","bold");doc.setFontSize(13);doc.text("Kitchen Expense Statement",14,34);
+doc.setFontSize(10);doc.setFont("helvetica","normal");
+doc.text("Resident: ",14,42);doc.setFont("helvetica","bold");doc.text(String(ri.name),33,42);
+doc.setFont("helvetica","normal");doc.text("TWC No.: "+(ri.twc||"-")+"     Room: "+ri.room,14,48);
+doc.text("Period: "+fmtMonth(S.month),W-14,42,{align:"right"});doc.text("Generated: "+fmtDate(today()),W-14,48,{align:"right"});
+const body=ri.list.map((e,i)=>[i+1,fmtDate(e.date),e.category,e.item+(e.billNo?" (Bill "+e.billNo+")":""),fmtQty(e.qty),e.unit,rs(e.mrp),rs(e.amount)]);
+doc.autoTable({startY:54,head:[["#","Date","Category","Item","Qty","Unit","MRP (Rs.)","Amount (Rs.)"]],body:body,theme:"grid",
+styles:{fontSize:9,cellPadding:2,textColor:[28,40,38],lineColor:[220,216,206]},headStyles:{fillColor:[15,92,84],textColor:255,fontStyle:"bold"},
+alternateRowStyles:{fillColor:[248,247,243]},columnStyles:{0:{cellWidth:8,halign:"center"},1:{cellWidth:24},2:{cellWidth:26},4:{halign:"right",cellWidth:12},5:{cellWidth:14},6:{halign:"right",cellWidth:22},7:{halign:"right",cellWidth:26}},margin:{left:14,right:14}});
+let y=doc.lastAutoTable.finalY+4;
+const sub=CATS.map(c=>[c,rs(ri.list.filter(e=>e.category===c).reduce((s,e)=>s+e.amount,0))]);
+const total=round2(ri.list.reduce((s,e)=>s+e.amount,0));
+sub.push(["Grand Total (Rs.)",rs(total)]);
+if(y>H-70){doc.addPage();y=20}
+doc.autoTable({startY:y,body:sub,theme:"plain",tableWidth:84,margin:{left:W-14-84},styles:{fontSize:10,cellPadding:1.8},columnStyles:{1:{halign:"right"}},
+didParseCell:d=>{if(d.row.index===sub.length-1){d.cell.styles.fontStyle="bold";d.cell.styles.fillColor=[230,241,238];d.cell.styles.fontSize=11}}});
+y=doc.lastAutoTable.finalY+8;
+doc.setFontSize(9.5);doc.setFont("helvetica","italic");
+const words=doc.splitTextToSize("Amount in words: "+inWords(total),W-28);doc.text(words,14,y);y+=words.length*5+16;
+if(y>H-20){doc.addPage();y=40}
+doc.setFont("helvetica","normal");doc.setDrawColor(150);doc.line(14,y,74,y);doc.line(W-74,y,W-14,y);
+doc.setFontSize(9);doc.text("Prepared by",14,y+5);doc.text("Verified by (Centre Manager)",W-14,y+5,{align:"right"});
+}
+function pageFooters(doc){const n=doc.internal.getNumberOfPages(),W=doc.internal.pageSize.getWidth(),H=doc.internal.pageSize.getHeight();
+for(let i=1;i<=n;i++){doc.setPage(i);doc.setFontSize(7.5);doc.setTextColor(130);doc.text("The Wisdom Club Nerul - Kitchen expense - "+fmtMonth(S.month)+" - Page "+i+" of "+n,W/2,H-8,{align:"center"})}}
+async function exportResidentPdf(resId){
+const ri=resInfo(resId);if(!ri.list.length)return toast("No entries for this resident","warn");
+let J;try{J=await needPdf()}catch(e){toast("PDF library couldn't load — downloading Excel instead.","warn");return exportResidentXlsx(resId)}
+const doc=new J({unit:"mm",format:"a4"});drawBill(doc,ri);pageFooters(doc);
+await offerFile("Kitchen_Bill_"+(ri.twc?safeName(ri.twc)+"_":"")+safeName(ri.room)+"_"+safeName(ri.name)+"_"+fmtMonthFile(S.month)+".pdf",doc.output("arraybuffer"));
+}
+async function exportAllPdf(){
+const sum=summaryRows(false);if(!sum.length)return toast("No entries in "+fmtMonth(S.month),"warn");
+let J;try{J=await needPdf()}catch(e){toast("PDF library couldn't load — downloading Excel instead.","warn");return exportMonthXlsx()}
+const doc=new J({unit:"mm",format:"a4"});
+sum.forEach((r,i)=>{if(i)doc.addPage();drawBill(doc,resInfo(r.residentId))});
+pageFooters(doc);
+await offerFile("Kitchen_Bills_All_Residents_"+fmtMonthFile(S.month)+".pdf",doc.output("arraybuffer"));
+}
+async function copySummary(){
+const sum=summaryRows(false);if(!sum.length)return toast("Nothing to copy","warn");
+const lines=[["Room","Resident","TWC No.","Fruits","Juices","Misc","Total"].join("\t")].concat(sum.map(r=>[r.room,r.name,r.twc||"",r.Fruits,r.Juices,r.Miscellaneous,r.total].join("\t")));
+try{await navigator.clipboard.writeText(lines.join("\n"));toast("Summary copied — paste into Excel or the bill sheet")}catch(e){toast("Copy isn't allowed here","err")}
+}
+async function withBusy(btn,fn){if(btn){btn.disabled=true}try{await fn()}catch(e){console.error(e);toast("Something went wrong preparing the file","err")}finally{if(btn)btn.disabled=false}}
+/* ---------- events ---------- */
+document.querySelectorAll("nav.tabs button").forEach(b=>b.onclick=()=>{
+document.querySelectorAll("nav.tabs button").forEach(x=>x.classList.toggle("on",x===b));
+document.querySelectorAll("section.view").forEach(v=>v.classList.toggle("on",v.id==="v-"+b.dataset.tab));
+S.tab=b.dataset.tab;window.scrollTo({top:0});
+});
+function setMonth(m){if(!m||m===S.month)return;S.month=m;$("#month").value=m;subscribeMonth()}
+$("#month").addEventListener("change",e=>setMonth(e.target.value));
+$("#mPrev").onclick=()=>setMonth(shiftMonth(S.month,-1));
+$("#mNext").onclick=()=>setMonth(shiftMonth(S.month,1));
+$("#fDate").addEventListener("change",()=>{const d=$("#fDate").value;if(d&&monthOf(d)!==S.month)setMonth(monthOf(d));else renderDay()});
+$("#fRes").addEventListener("change",()=>{syncSaveBtn();renderDay()});
+$("#addRow").onclick=()=>{const last=readCart().pop();const d=addCartRow({cat:last?last.cat:"Fruits"});d.querySelector(".c-item").focus()};
+$("#saveCart").onclick=saveCart;
+["#rRes","#rCat"].forEach(s=>$(s).addEventListener("change",renderRegister));
+$("#rSearch").addEventListener("input",renderRegister);
+$("#showAll").addEventListener("change",renderSummary);
+$("#showDis").addEventListener("change",renderResidents);
+$("#addRes").onclick=addResident;
+$("#dlMonthXlsx").onclick=e=>withBusy(e.currentTarget,exportMonthXlsx);
+$("#dlAllPdf").onclick=e=>withBusy(e.currentTarget,exportAllPdf);
+$("#dlMonthCsv").onclick=e=>withBusy(e.currentTarget,exportMonthCsv);
+$("#regXlsx").onclick=e=>withBusy(e.currentTarget,exportFilteredXlsx);
+$("#copySum").onclick=copySummary;
+document.addEventListener("click",e=>{
+const b=e.target.closest("[data-act]");if(!b)return;
+const a=b.dataset.act;
+if(a==="edit")openEdit(b.dataset.doc,b.dataset.id);
+else if(a==="del")deleteEntry(b.dataset.doc,b.dataset.id);
+else if(a==="rpdf")withBusy(b,()=>exportResidentPdf(b.dataset.res));
+else if(a==="rxlsx")withBusy(b,()=>exportResidentXlsx(b.dataset.res));
+else if(a==="rview"){$("#rRes").value=b.dataset.res;$("#rCat").value="";$("#rSearch").value="";renderRegister();document.querySelector('nav.tabs button[data-tab="register"]').click()}
+else if(a==="redit")editResident(b.dataset.res);
+else if(a==="roff")setResStatus(b.dataset.res,"discharged");
+else if(a==="ron")setResStatus(b.dataset.res,"active");
+});
+/* ---------- init ---------- */
+$("#rCat").innerHTML='<option value="">All categories</option>'+CATS.map(c=>"<option>"+c+"</option>").join("");
+$("#month").value=S.month;
+$("#fDate").value=today();
+try{const m=JSON.parse(lsGet("kx_me")||"null");if(m)setMe(m)}catch(e){}
+$("#lgId").value=lsGet("kx_lastid")||"";
+$("#loginForm").addEventListener("submit",doLogin);
+$("#logout").onclick=async()=>{const t=S.token;showLogin("");S.entries=[];S.residents=[];renderSelects();renderResidents();renderData();try{await post({action:"logout",token:t})}catch(e){}};
+addCartRow();
+renderSelects();renderResidents();renderData();renderItemList();
+if(!S.token){setStatus("","Please log in");showLogin("")}
+else{subscribeMonth()}
+{setInterval(refreshQuiet,60000);document.addEventListener("visibilitychange",()=>{if(!document.hidden&&Date.now()-S.lastSync>30000)refreshQuiet()})}
+$("#refresh").onclick=()=>{if(!S.token)return showLogin("");subscribeMonth();toast("Refreshing…")};
+})();
+</script>
+</body>
+</html>
